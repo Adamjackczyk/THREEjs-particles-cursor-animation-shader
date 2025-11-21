@@ -16,8 +16,8 @@ void main()
     displacementIntensity = smoothstep(0.1, 0.3, displacementIntensity);
 
     vec3 displacement = vec3(
-        cos(aAngle) * 0.2,
-        sin(aAngle) * 0.2,
+        cos(aAngle) * 0.00001,
+        sin(aAngle) * 0.00001,
         1.0);
 
     displacement = normalize(displacement);
@@ -35,12 +35,13 @@ void main()
     gl_Position = projectedPosition;
 
     //Picture
-    float pictureIntensity = texture(uPictureTexture, uv).r;
+    vec4 picture = texture(uPictureTexture, uv);
+    float pictureIntensity = picture.r;
 
     // Point size
     gl_PointSize = 0.15 * pictureIntensity * uResolution.y;
     gl_PointSize *= (1.0 / - viewPosition.z);
 
     //Color
-    vColor = vec3(pow(pictureIntensity, 2.0));
+    vColor = picture.rgb;
 }

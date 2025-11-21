@@ -65,6 +65,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setClearColor('#181818')
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(sizes.pixelRatio)
+renderer.outputColorSpace = THREE.SRGBColorSpace
 
 /**
  * Displacement
@@ -81,7 +82,7 @@ displacement.canvas.style.position = 'fixed'
 displacement.canvas.style.top = 0
 displacement.canvas.style.left = 0
 displacement.canvas.style.zIndex = 10
-document.body.appendChild(displacement.canvas)
+//document.body.appendChild(displacement.canvas)
 
 //Context
 displacement.context = displacement.canvas.getContext('2d')
@@ -94,7 +95,7 @@ displacement.glowImage.src = './glow.png'
 //Interactive Plane
 
 displacement.interactivePlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
+    new THREE.PlaneGeometry(16, 9),
     new THREE.MeshBasicMaterial({ color: 'red', side: THREE.DoubleSide})
 
 )
@@ -124,7 +125,7 @@ displacement.texture = new THREE.CanvasTexture(displacement.canvas)
 /**
  * Particles
  */
-const particlesGeometry = new THREE.PlaneGeometry(10, 10, 128, 128)
+const particlesGeometry = new THREE.PlaneGeometry(16, 9, 1024 , 1024 ) //   128, 256, 512, 1024, 2048 higher bust computers
 particlesGeometry.setIndex(null)
 particlesGeometry.deleteAttribute('normal')
 const intensitiesArray = new Float32Array(particlesGeometry.attributes.position.count)
@@ -145,10 +146,11 @@ const particlesMaterial = new THREE.ShaderMaterial({
     uniforms:
     {
         uResolution: new THREE.Uniform(new THREE.Vector2(sizes.width * sizes.pixelRatio, sizes.height * sizes.pixelRatio)),
-        uPictureTexture: new THREE.Uniform(textureLoader.load('./picture-1.png')),
+        uPictureTexture: new THREE.Uniform(textureLoader.load('./sarah-5.jpg')),
         uDisplacementTexture: new THREE.Uniform(displacement.texture)
     }
 })
+particlesMaterial.uniforms.uPictureTexture.value.colorSpace = THREE.SRGBColorSpace
 const particles = new THREE.Points(particlesGeometry, particlesMaterial)
 scene.add(particles)
 
@@ -181,7 +183,7 @@ const tick = () =>
     const alpha = Math.min(cursorDistance * 0.1, 1)
     
     //Draw glow
-    const glowSize = displacement.canvas.width * 0.25
+    const glowSize = displacement.canvas.width * 0.15
     displacement.context.globalCompositeOperation = 'lighten'
     displacement.context.globalAlpha = alpha
     displacement.context.drawImage(
